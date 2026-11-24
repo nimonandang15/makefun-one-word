@@ -36,3 +36,13 @@ if (/\s/.test(text)) {
 
 fs.mkdirSync("/output", { recursive: true });
 fs.writeFileSync("/output/entry.txt", text, "utf8");
+
+// Round-trip check: what the judge reads back must be byte-identical to
+// the gated text above — a silent encoding slip would otherwise ship an
+// entry that fails the gate even though the in-memory text passed it.
+const written = fs.readFileSync("/output/entry.txt", "utf8");
+if (written !== text) {
+  throw new Error(
+    `entry.txt round-trip mismatch: wrote ${JSON.stringify(text)}, read back ${JSON.stringify(written)}`,
+  );
+}
